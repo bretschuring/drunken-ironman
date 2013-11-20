@@ -1,0 +1,425 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns="http://www.example.org/diagram-graphics"
+	targetNamespace="http://www.example.org/diagram-graphics" xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	xmlns:dc="http://www.example.org/diagram-common" elementFormDefault="qualified">
+	<xs:import namespace="http://www.example.org/diagram-common"
+		schemaLocation="diagram-common.xsd" />
+
+	<!-- Transform data types -->
+
+	<xs:complexType name="Transform" abstract="true">
+	</xs:complexType>
+
+	<xs:complexType name="Translate">
+		<xs:complexContent>
+			<xs:extension base="Transform">
+				<xs:sequence>
+					<xs:element name="deltaX" type="dc:Real"></xs:element>
+					<xs:element name="deltaY" type="dc:Real"></xs:element>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="Scale">
+		<xs:complexContent>
+			<xs:extension base="Transform">
+				<xs:sequence>
+					<xs:element name="factorX">
+						<xs:simpleType>
+							<xs:restriction base="dc:Real">
+								<xs:minInclusive value="0"></xs:minInclusive>
+							</xs:restriction>
+						</xs:simpleType>
+					</xs:element>
+					<xs:element name="factorY">
+						<xs:simpleType>
+							<xs:restriction base="dc:Real">
+								<xs:minInclusive value="0"></xs:minInclusive>
+							</xs:restriction>
+						</xs:simpleType>
+					</xs:element>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="Rotate">
+		<xs:complexContent>
+			<xs:extension base="Transform">
+				<xs:sequence>
+					<xs:element name="angle" type="dc:Real"></xs:element>
+					<xs:element name="center" type="dc:Point" minOccurs="0"></xs:element>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="Skew">
+		<xs:complexContent>
+			<xs:extension base="Transform">
+				<xs:sequence>
+					<xs:element name="angleX" type="dc:Real"></xs:element>
+					<xs:element name="angleY" type="dc:Real"></xs:element>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="Matrix">
+		<xs:complexContent>
+			<xs:extension base="Transform">
+				<xs:sequence>
+					<xs:element name="a" type="dc:Real"></xs:element>
+					<xs:element name="b" type="dc:Real"></xs:element>
+					<xs:element name="c" type="dc:Real"></xs:element>
+					<xs:element name="d" type="dc:Real"></xs:element>
+					<xs:element name="e" type="dc:Real"></xs:element>
+					<xs:element name="f" type="dc:Real"></xs:element>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<!-- Path command data types -->
+
+	<xs:complexType name="PathCommand" abstract="true">
+		<xs:sequence>
+			<xs:element name="isRelative" type="dc:Boolean" default="false"></xs:element>
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="MoveTo">
+		<xs:complexContent>
+			<xs:extension base="PathCommand">
+				<xs:sequence>
+					<xs:element name="point" type="dc:Point"></xs:element>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="CubicCurveTo">
+		<xs:complexContent>
+			<xs:extension base="PathCommand">
+				<xs:sequence>
+					<xs:element name="point" type="dc:Point"></xs:element>
+					<xs:element name="startControl" type="dc:Point"></xs:element>
+					<xs:element name="endControl" type="dc:Point"></xs:element>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="LineTo">
+		<xs:complexContent>
+			<xs:extension base="PathCommand">
+				<xs:sequence>
+					<xs:element name="point" type="dc:Point"></xs:element>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="QuadraticCurveTo">
+		<xs:complexContent>
+			<xs:extension base="PathCommand">
+				<xs:sequence>
+					<xs:element name="point" type="dc:Point"></xs:element>
+					<xs:element name="control" type="dc:Point"></xs:element>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="ClosePath">
+		<xs:complexContent>
+			<xs:extension base="PathCommand">
+				<xs:sequence>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="EllipticalArcTo">
+		<xs:complexContent>
+			<xs:extension base="PathCommand">
+				<xs:sequence>
+					<xs:element name="point" type="dc:Point"></xs:element>
+					<xs:element name="radii" type="dc:Dimension"></xs:element>
+					<xs:element name="rotation" type="dc:Real"></xs:element>
+					<xs:element name="isLargeArc" type="dc:Boolean"></xs:element>
+					<xs:element name="isSweep" type="dc:Boolean"></xs:element>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<!-- Graphical elements -->
+	<xs:complexType name="GraphicalElement" abstract="true">
+		<xs:sequence>
+			<xs:element name="transform" type="Transform" minOccurs="0"
+				maxOccurs="unbounded"></xs:element>
+			<xs:element name="localStyle" type="Style" minOccurs="0"
+				maxOccurs="unbounded"></xs:element>
+			<xs:element name="clipPath" type="ClipPath" minOccurs="0"></xs:element>
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="Rectangle">
+		<xs:complexContent>
+			<xs:extension base="GraphicalElement">
+				<xs:sequence>
+					<xs:element name="bounds" type="dc:Bounds"></xs:element>
+					<xs:element name="cornerRadius" type="dc:Real"></xs:element>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="Text">
+		<xs:complexContent>
+			<xs:extension base="GraphicalElement">
+				<xs:sequence>
+					<xs:element name="data" type="dc:String"></xs:element>
+					<xs:element name="bounds" type="dc:Bounds"></xs:element>
+					<xs:element name="alignment" type="dc:AlignmentKind"></xs:element>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="Image">
+		<xs:complexContent>
+			<xs:extension base="GraphicalElement">
+				<xs:sequence>
+					<xs:element name="source" type="dc:String"></xs:element>
+					<xs:element name="bounds" type="dc:Bounds"></xs:element>
+					<xs:element name="isAspectRationPreserved" type="dc:Boolean"></xs:element>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="Circle">
+		<xs:complexContent>
+			<xs:extension base="GraphicalElement">
+				<xs:sequence>
+					<xs:element name="center" type="dc:Point"></xs:element>
+					<xs:element name="radius">
+						<xs:simpleType>
+							<xs:restriction base="dc:Real">
+								<xs:minInclusive value="0"></xs:minInclusive>
+							</xs:restriction>
+						</xs:simpleType>
+					</xs:element>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="Ellipse">
+		<xs:complexContent>
+			<xs:extension base="GraphicalElement">
+				<xs:sequence>
+					<xs:element name="center" type="dc:Point"></xs:element>
+					<xs:element name="radii" type="dc:Dimension"></xs:element>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="MarkedElement">
+		<xs:complexContent>
+			<xs:extension base="GraphicalElement">
+				<xs:sequence>
+					<xs:element name="startMarker" minOccurs="0"></xs:element>
+					<xs:element name="midMarker" minOccurs="0"></xs:element>
+					<xs:element name="endMarker" minOccurs="0"></xs:element>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="Polyline">
+		<xs:complexContent>
+			<xs:extension base="MarkedElement">
+				<xs:sequence>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="Line">
+		<xs:complexContent>
+			<xs:extension base="MarkedElement">
+				<xs:sequence>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="Path">
+		<xs:complexContent>
+			<xs:extension base="MarkedElement">
+				<xs:sequence>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="Polygon">
+		<xs:complexContent>
+			<xs:extension base="MarkedElement">
+				<xs:sequence>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="Group">
+		<xs:complexContent>
+			<xs:extension base="GraphicalElement">
+				<xs:sequence>
+					<xs:element name="member" type="GraphicalElement"
+						minOccurs="0" maxOccurs="unbounded"></xs:element>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="ClipPath">
+		<xs:complexContent>
+			<xs:extension base="Group">
+				<xs:sequence>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="Canvas">
+		<xs:complexContent>
+			<xs:extension base="Group">
+				<xs:sequence>
+					<xs:element name="backgroundColor" type="dc:Color"
+						minOccurs="0"></xs:element>
+					<xs:element name="backgroundFill"></xs:element>
+					<xs:element name="packagedFill" type="Fill" minOccurs="0"
+						maxOccurs="unbounded"></xs:element>
+					<xs:element name="packagedMarker" type="Marker"
+						minOccurs="0" maxOccurs="unbounded"></xs:element>
+					<xs:element name="packagedStyle" type="Style" minOccurs="0"
+						maxOccurs="unbounded"></xs:element>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="Marker">
+		<xs:complexContent>
+			<xs:extension base="Group">
+				<xs:sequence>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="Fill">
+	</xs:complexType>
+
+	<xs:complexType name="Gradient">
+		<xs:complexContent>
+			<xs:extension base="Fill">
+				<xs:sequence>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="Pattern">
+		<xs:complexContent>
+			<xs:extension base="Fill">
+				<xs:sequence>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="LinearGradient">
+		<xs:complexContent>
+			<xs:extension base="Gradient">
+				<xs:sequence>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+
+	<xs:complexType name="RadialGradient">
+		<xs:complexContent>
+			<xs:extension base="Gradient">
+				<xs:sequence>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="Style">
+		<xs:sequence>
+			<xs:element name="fillColor" type="dc:Color" minOccurs="0"
+				maxOccurs="1"></xs:element>
+			<xs:element name="fillOpacity" minOccurs="0" maxOccurs="1">
+				<xs:simpleType>
+					<xs:restriction base="dc:Real">
+						<xs:minInclusive value="0"></xs:minInclusive>
+						<xs:maxInclusive value="1"></xs:maxInclusive>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="strokeWidth" minOccurs="0" maxOccurs="1">
+				<xs:simpleType>
+					<xs:restriction base="dc:Real">
+						<xs:minInclusive value="0"></xs:minInclusive>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="strokeOpacity" minOccurs="0" maxOccurs="1">
+				<xs:simpleType>
+					<xs:restriction base="dc:Real">
+						<xs:minInclusive value="0"></xs:minInclusive>
+						<xs:maxInclusive value="1"></xs:maxInclusive>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="strokeColor" type="dc:Color" minOccurs="0"
+				maxOccurs="1"></xs:element>
+			<xs:element name="strokeDashLength" type="dc:Real"
+				minOccurs="0" maxOccurs="unbounded">
+				<!-- TODO must be an even number -->
+			</xs:element>
+			<xs:element name="fontSize" minOccurs="0" maxOccurs="1">
+				<xs:simpleType>
+					<xs:restriction base="dc:Real">
+						<xs:minInclusive value="0"></xs:minInclusive>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="fontName" type="dc:String" minOccurs="0"
+				maxOccurs="1"></xs:element>
+			<xs:element name="fontColor" type="dc:Color" minOccurs="0"
+				maxOccurs="1"></xs:element>
+			<xs:element name="fontItalic" type="dc:Boolean" minOccurs="0"
+				maxOccurs="1"></xs:element>
+			<xs:element name="fontBold" type="dc:Boolean" minOccurs="0"
+				maxOccurs="1"></xs:element>
+			<xs:element name="fontUnderline" type="dc:Boolean"
+				minOccurs="0" maxOccurs="1"></xs:element>
+			<xs:element name="fontStrikeThrough" type="dc:Boolean"
+				minOccurs="0" maxOccurs="1"></xs:element>
+			<xs:element name="fill"></xs:element>
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:element name="canvas" type="Canvas"></xs:element>
+
+</xs:schema>

@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns="http://www.example.org/diagram-interchange"
+	targetNamespace="http://www.example.org/diagram-interchange" xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	xmlns:dc="http://www.example.org/diagram-common" elementFormDefault="qualified">
+	<xs:import namespace="http://www.example.org/diagram-common"
+		schemaLocation="diagram-common.xsd" />
+
+	<xs:complexType name="Element"></xs:complexType>
+	<xs:complexType name="Style" abstract="true"></xs:complexType>
+
+	<xs:complexType name="DiagramElement" abstract="true">
+		<xs:sequence>
+			<xs:element name="ownedElement" type="DiagramElement"
+				maxOccurs="unbounded"></xs:element>
+			<xs:element name="modelElement"></xs:element>
+			<xs:element name="localStyle" type="Style"></xs:element>
+			<xs:element name="sharedStyle"></xs:element>
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="Edge" abstract="true">
+		<xs:complexContent>
+			<xs:extension base="DiagramElement">
+				<xs:sequence>
+					<xs:element name="waypoint" type="dc:Point" minOccurs="0"
+						maxOccurs="unbounded"></xs:element>
+					<xs:element name="source"></xs:element>
+					<xs:element name="target"></xs:element>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="Shape" abstract="true">
+		<xs:complexContent>
+			<xs:extension base="DiagramElement">
+				<xs:sequence>
+					<xs:element name="bounds" type="dc:Bounds" minOccurs="0"
+						maxOccurs="1"></xs:element>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="Diagram">
+		<xs:complexContent>
+			<xs:extension base="Shape">
+				<xs:sequence>
+					<xs:element name="name" type="xs:string"></xs:element>
+					<xs:element name="documentation" type="xs:string"></xs:element>
+					<xs:element name="resolution" type="dc:Real"></xs:element>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+</xs:schema>
